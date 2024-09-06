@@ -1,6 +1,8 @@
 go 1.18
 
 use (
+    ./lab2/client
     ./lab1
+    ./lab2/server
     ./utils
 )
