@@ -1,8 +1,10 @@
-go 1.18
+go 1.23.0
 
 use (
-    ./lab2/client
-    ./lab1
-    ./lab2/server
-    ./utils
+	./lab1
+	./lab2/client
+	./lab2/server
+	./lab3
+	./lab4/src
+	./utils
 )
