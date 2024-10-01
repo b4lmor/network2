@@ -22,11 +22,12 @@ func main() {
 		if input == "exit" {
 			break
 		}
-		ctx.Wg.Add(3)
 		response, err := ctx.GraphHopperClient.FetchPlaces(input)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			continue
 		}
+		ctx.Wg.Add(3)
 		ctx.PlacesChan <- response
 		ctx.Wg.Wait()
 	}

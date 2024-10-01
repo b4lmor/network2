@@ -6,5 +6,6 @@ use (
 	./lab2/server
 	./lab3
 	./lab4/src
+	./lab5/src
 	./utils
 )

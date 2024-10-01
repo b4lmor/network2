@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"fmt"
+	"lab3/client"
 	"lab3/context"
 	"log"
 	"strconv"
@@ -64,36 +65,40 @@ func ConsumeOpenTripMapLocationResponse(ctx *context.Context) {
 	for {
 		response := <-ctx.LocationChan
 		var builder strings.Builder
-		builder.WriteString("The closest attractions:\n")
+		builder.WriteString("Nearby attractions:\n")
 		for _, r := range response.Features {
 			name := r.Properties.Name
-			//log.Println(r.Properties.XID)
-			k, err := ctx.OpenTripMapClient.FetchProperties(r.Properties.XID)
+			properties, err := ctx.OpenTripMapClient.FetchProperties(r.Properties.XID)
 			if err != nil {
 				continue
 			}
 			if len(name) == 0 {
 				continue
 			}
-			desc := utils.RemoveHTMLTags(k.Info.Descr)
-			desc = utils.DecodeHTMLEntities(desc)
-			desc = strings.TrimSpace(desc)
-			desc = strings.ReplaceAll(desc, "\t", " ")
-			desc = strings.ReplaceAll(desc, "\n", " ")
-			if len(desc) > 0 {
-				desc = ": " + desc
-			}
-			runes := []rune(desc)
-			var result string
-			if len(runes) > 40 {
-				runes = runes[:80]
-				result = string(runes) + "..."
-			} else {
-				result = string(runes)
-			}
+			var result = prettify(properties)
 			builder.WriteString(fmt.Sprintf("\t- %s%s\n", name, result))
 		}
 		fmt.Println(builder.String())
 		ctx.Wg.Done()
 	}
+}
+
+func prettify(properties *client.PropertiesResponse) string {
+	desc := utils.RemoveHTMLTags(properties.Info.Descr)
+	desc = utils.DecodeHTMLEntities(desc)
+	desc = strings.TrimSpace(desc)
+	desc = strings.ReplaceAll(desc, "\t", " ")
+	desc = strings.ReplaceAll(desc, "\n", " ")
+	if len(desc) > 0 {
+		desc = ": " + desc
+	}
+	runes := []rune(desc)
+	var result string
+	if len(runes) > 40 {
+		runes = runes[:80]
+		result = string(runes) + "..."
+	} else {
+		result = string(runes)
+	}
+	return result
 }

@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	uploadDir   = "./assets"
-	PORT        = "8000"
-	DELAY       = 1 * time.Second
-	BUFFER_SIZE = 4096
+	UploadDir  = "./assets"
+	Port       = "8000"
+	Delay      = 1 * time.Second
+	BufferSize = 4096
 )
 
 type ClientInfo struct {
@@ -26,7 +26,7 @@ type ClientInfo struct {
 var clients = utils.NewSafeMap[net.Addr, *ClientInfo]()
 
 func main() {
-	startServer(PORT)
+	startServer(Port)
 }
 
 func startServer(port string) {
@@ -78,11 +78,11 @@ func handleClient(conn net.Conn) {
 	clientInfo, _ := clients.Get(addr)
 	clientInfo.TotalBytes = fileSize
 
-	if _, err = os.Stat(uploadDir); os.IsNotExist(err) {
-		os.Mkdir(uploadDir, os.ModePerm)
+	if _, err = os.Stat(UploadDir); os.IsNotExist(err) {
+		os.Mkdir(UploadDir, os.ModePerm)
 	}
 
-	filePath := filepath.Join(uploadDir, fileName)
+	filePath := filepath.Join(UploadDir, fileName)
 	file, err := os.Create(filePath)
 	if err != nil {
 		fmt.Printf("Error creating file: %s\n", err)
@@ -92,7 +92,7 @@ func handleClient(conn net.Conn) {
 
 	go speedMonitor(addr)
 
-	buffer := make([]byte, BUFFER_SIZE)
+	buffer := make([]byte, BufferSize)
 	for {
 		if clientInfo.ReceivedBytes >= fileSize {
 			break
@@ -120,7 +120,7 @@ func handleClient(conn net.Conn) {
 func speedMonitor(addr net.Addr) {
 	currentReceived := int64(0)
 	for {
-		time.Sleep(DELAY)
+		time.Sleep(Delay)
 		if info, exists := clients.Get(addr); exists {
 			elapsed := time.Since(info.StartTime).Seconds()
 			if elapsed > 0 {
