@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package game;
+option go_package = "internal_api/";
+
+import "google/protobuf/empty.proto";
+
+service ServerToClient {
+  rpc FillSquares (FillSquaresRequest) returns (google.protobuf.Empty);
+  rpc EndGame (EndGameRequest) returns (google.protobuf.Empty);
+  rpc SendGamesInfo (SendGamesInfoRequest) returns (google.protobuf.Empty);
+  rpc SendGameInfoFull (SendGameInfoFullRequest) returns (google.protobuf.Empty);
+}
+
+service ClientToServer {
+  rpc CreateGame (CreateGameRequest) returns (CreateGameResponse);
+  rpc JoinGame (JoinGameRequest) returns (JoinGameResponse);
+  rpc LeaveGame (google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc SendDirection (SendDirectionRequest) returns (google.protobuf.Empty);
+}
+
+message SendGameInfoFullRequest {
+  string gameName = 1;
+  string address = 2;
+  string masterNickname = 3;
+  int32 height = 4;
+  int32 width = 5;
+  int32 maxFood = 6;
+  repeated Player players = 7;
+}
+
+message JoinGameResponse {
+  bool success = 1;
+  optional string message = 2;
+}
+
+message Player {
+  string nickname = 1;
+  int32 score = 2;
+  NodeRole role = 3;
+}
+
+enum NodeRole {
+  NORMAL = 0;
+  MASTER = 1;
+  DEPUTY = 2;
+  VIEWER = 3;
+}
+
+message GameInfoShort {
+  string gameName = 1;
+  string address = 2;
+  int32 playerCount = 3;
+}
+
+message SendGamesInfoRequest {
+  repeated GameInfoShort gameInfo = 1;
+}
+
+message EndGameRequest {
+  int32 score = 1;
+}
+
+message SendDirectionRequest {
+  Directions direction = 1;
+}
+
+message JoinGameRequest {
+  string address = 1;
+  string nickname = 2;
+}
+
+message CreateGameResponse {
+  bool success = 1;
+  optional string message = 2;
+}
+
+message CreateGameRequest {
+  int32 width = 1;
+  int32 height = 2;
+  int32 food = 3;
+  string gameName = 4;
+  string nickname = 5;
+}
+
+message FillSquaresRequest {
+  repeated PointColor points = 1;
+}
+
+message PointColor {
+  Point point = 1;
+  int32 color = 2;
+}
+
+message Point {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+enum Directions {
+  UP = 0;
+  DOWN = 1;
+  LEFT = 2;
+  RIGHT = 3;
+}
